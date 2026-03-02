@@ -105,7 +105,9 @@ GATE POLICY:
 - If a milestone is code-complete AND all acceptance criteria are checked, mark it COMPLETE.
 - If code-complete for 2+ cycles with no P0 blockers, FORCE-ADVANCE to the next milestone.
 - Only P0 issues (system won't run) block advancement. P1/P2 are advisory.
-- Your job is to keep the team SHIPPING, not waiting.")
+- Your job is to keep the team SHIPPING, not waiting.
+
+CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
 echo "  [OK] PM cycle ($PM_INTERVAL): $PM_ID"
 
 REV_ID=$(create_cron "reviewer" "reviewer" "$PM_INTERVAL" "300" "high" \
@@ -128,7 +130,9 @@ TEST COVERAGE ENFORCEMENT:
 - Check if new code has corresponding test files. Flag untested modules as P1.
 - Backend target: 80%+ coverage. Frontend target: component tests for every page.
 - If coverage drops below 60% on any new module, write a BLOCKER assigned to the module owner.
-- Include test coverage summary in your feedback each cycle.")
+- Include test coverage summary in your feedback each cycle.
+
+CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
 echo "  [OK] Reviewer cycle ($PM_INTERVAL): $REV_ID"
 
 ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
@@ -147,7 +151,9 @@ TESTING RULES:
 - Every new endpoint MUST have at least: success test, auth-required test, error case test.
 - Every new module MUST have a corresponding test file.
 - Do NOT check off GAP_ANALYSIS items until tests pass.
-Stay on your assigned milestone. Do not skip ahead.")
+Stay on your assigned milestone. Do not skip ahead.
+
+CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
 echo "  [OK] Engineer cycle ($WORKER_INTERVAL): $ENG_ID"
 
 SRE_ID=$(create_cron "sre" "sre" "$WORKER_INTERVAL" "1500" "high" \
@@ -166,7 +172,9 @@ TESTING RULES:
 - Test resource limits enforcement, error paths (container crash, timeout, missing resource).
 - Verify Dockerfile builds successfully as part of your testing.
 - Do NOT check off GAP_ANALYSIS items until tests pass.
-Focus on infrastructure, sandbox, Docker, deployment, resource limits.")
+Focus on infrastructure, sandbox, Docker, deployment, resource limits.
+
+CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
 echo "  [OK] SRE cycle ($WORKER_INTERVAL): $SRE_ID"
 
 DES_ID=$(create_cron "designer" "designer" "$WORKER_INTERVAL" "1500" "high" \
@@ -184,7 +192,9 @@ TESTING RULES:
 - Write tests for every component and page you create or modify.
 - Test: rendering, user interactions, API integration (mock fetch), auth state.
 - Do NOT check off GAP_ANALYSIS items until tests pass.
-Focus on frontend UI, React components, design system, user experience.")
+Focus on frontend UI, React components, design system, user experience.
+
+CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
 echo "  [OK] Designer cycle ($WORKER_INTERVAL): $DES_ID"
 
 # -- 4. Register project ---------------------------------------------
