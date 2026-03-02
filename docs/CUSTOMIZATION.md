@@ -74,10 +74,10 @@ DE_ID=$(create_cron "data-engineer" "data-engineer" "30m" "900" "high" \
 
 ## Tuning Cron Intervals
 
-Default intervals:
-- **PM**: 20 minutes (fast feedback loop)
-- **Reviewer**: 20 minutes (fast steering)
-- **Workers**: 30 minutes (time to implement)
+Default intervals (configurable via `--pm-interval` and `--worker-interval`):
+- **PM**: 45 minutes (reads code, updates plan, force-advances stale gates)
+- **Reviewer**: 45 minutes (reviews code, steers agents, approves milestones)
+- **Workers**: 1 hour (reads feedback, implements, updates gap)
 
 ### For faster iteration
 Reduce intervals (costs more API credits):

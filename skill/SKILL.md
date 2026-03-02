@@ -36,7 +36,7 @@ bash command:"~/.openclaw/workspace/skills/team-project/scripts/bootstrap.sh '[n
 
 This creates:
 - GAP_ANALYSIS.md, EXECUTION_PLAN.md, REVIEWER_FEEDBACK.md in the project
-- 5 autonomous cron work cycles (PM 20m, Reviewer 20m, Engineer 30m, SRE 30m, Designer 30m)
+- 5 autonomous cron work cycles (PM 45m, Reviewer 45m, Engineer 1h, SRE 1h, Designer 1h)
 - Project registration in ~/.openclaw/team.json
 - PM kickoff meeting to fill in the plan
 
@@ -78,11 +78,11 @@ bash command:"~/.openclaw/workspace/skills/team-project/scripts/manage.sh stop"
 
 ### The Cycle
 
-Every 20 minutes:
-- PM reads code changes, updates EXECUTION_PLAN.md
-- Reviewer reads code, writes steering to REVIEWER_FEEDBACK.md
+Every 45 minutes:
+- PM reads code changes, updates EXECUTION_PLAN.md, force-advances stale milestones
+- Reviewer reads code, writes steering to REVIEWER_FEEDBACK.md, approves milestones when criteria met
 
-Every 30 minutes:
+Every 1 hour:
 - Engineer reads feedback, reads plan, implements, updates gap
 - SRE reads feedback, reads plan, implements, updates gap
 - Designer reads feedback, reads plan, implements, updates gap
@@ -96,7 +96,7 @@ Every 30 minutes:
 
 ## Cron Message Templates
 
-### PM (every 20m)
+### PM (every 45m)
 ```
 You are the PM. You OWN the execution plan. Every cycle:
 1. READ [path]/EXECUTION_PLAN.md
@@ -104,19 +104,31 @@ You are the PM. You OWN the execution plan. Every cycle:
 3. CHECK code changes in [path]
 4. UPDATE EXECUTION_PLAN.md: mark criteria, update status, log progress
 5. FLAG blockers if agents are stuck or on wrong milestone
+
+GATE POLICY:
+- If a milestone is code-complete AND all acceptance criteria are checked, mark it COMPLETE.
+- If code-complete for 2+ cycles with no P0 blockers, FORCE-ADVANCE to the next milestone.
+- Only P0 issues (system won't run) block advancement. P1/P2 are advisory.
+- Your job is to keep the team SHIPPING, not waiting.
 ```
 
-### Reviewer (every 20m)
+### Reviewer (every 45m)
 ```
 You are the CODE REVIEWER. Every cycle:
 1. READ [path]/EXECUTION_PLAN.md for milestones
 2. CHECK recent code in [path]
 3. REVIEW: security, correctness vs milestone, architecture
 4. WRITE steering to [path]/REVIEWER_FEEDBACK.md per agent
-5. FLAG if agents are on wrong milestone
+
+APPROVAL RULES:
+- If ALL acceptance criteria for a milestone are checked, APPROVE IT. Write APPROVED clearly.
+- Only block on P0 issues (system cannot run). P1/P2 are noted but do NOT block approval.
+- A milestone code-complete for 2+ cycles MUST be approved or state the single remaining fix.
+- After approving, tell agents to START the next milestone immediately.
+- Your job is to STEER and UNBLOCK. Ship progress, not perfection.
 ```
 
-### Workers (every 30m)
+### Workers (every 1h)
 ```
 You are the [ROLE]. Every cycle:
 1. FIRST read [path]/REVIEWER_FEEDBACK.md for steering. Follow it.
@@ -129,7 +141,7 @@ You are the [ROLE]. Every cycle:
 ## Key Principles
 
 1. **PM owns the plan** -- defines milestones, sequences, acceptance criteria
-2. **Reviewer steers** -- writes feedback that workers read first each cycle
+2. **Reviewer steers** -- writes feedback that workers read first each cycle; must APPROVE milestones when criteria are met
 3. **Workers follow** -- read feedback before picking tasks, stay on assigned milestone
 4. **Sequential milestones** -- no skipping ahead; parallel tracks explicitly marked
-5. **Acceptance gates** -- reviewer must approve before milestone is "done"
+5. **Ship over perfection** -- P0 issues (system can't run) block advancement; P1/P2 are advisory. Milestones code-complete for 2+ cycles are force-advanced by PM.

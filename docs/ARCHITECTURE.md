@@ -62,6 +62,8 @@ EXECUTION_PLAN.md          REVIEWER_FEEDBACK.md
 - Per-agent steering: DO NOW / DO NOT instructions
 - Workers read this FIRST every cycle before anything else
 - Primary mechanism for course-correction
+- Must include explicit APPROVED / BLOCKER status per milestone
+- Only P0 issues (system can't run) block advancement; P1/P2 are advisory
 - Updated every reviewer cycle
 
 #### GAP_ANALYSIS.md (shared)
@@ -73,11 +75,11 @@ EXECUTION_PLAN.md          REVIEWER_FEEDBACK.md
 ### The Cycle
 
 ```
-Every 20 minutes:
-  PM    -> reads code changes -> updates EXECUTION_PLAN.md
-  Reviewer -> reads code     -> writes REVIEWER_FEEDBACK.md
+Every 45 minutes:
+  PM       -> reads code changes -> updates EXECUTION_PLAN.md -> force-advances stale milestones
+  Reviewer -> reads code         -> writes REVIEWER_FEEDBACK.md -> approves milestones when criteria met
 
-Every 30 minutes:
+Every 1 hour:
   Engineer -> reads feedback -> reads plan -> implements -> updates gap
   SRE      -> reads feedback -> reads plan -> implements -> updates gap
   Designer -> reads feedback -> reads plan -> implements -> updates gap
@@ -100,11 +102,11 @@ Every 30 minutes:
 
 | Role | Agent ID | Cycle | Purpose |
 |------|----------|-------|---------|
-| PM | pm | 20m | Owns milestones, tracks progress, unblocks agents |
-| Reviewer | reviewer | 20m | Security review, steering feedback, quality gates |
-| Engineer | main | 30m | Implements features, writes backend code |
-| SRE | sre | 30m | Infrastructure, Docker, CI/CD, reliability |
-| Designer | designer | 30m | Frontend UI, components, design system |
+| PM | pm | 45m | Owns milestones, tracks progress, force-advances stale gates |
+| Reviewer | reviewer | 45m | Security review, steering feedback, approves milestones |
+| Engineer | main | 1h | Implements features, writes backend code |
+| SRE | sre | 1h | Infrastructure, Docker, CI/CD, reliability |
+| Designer | designer | 1h | Frontend UI, components, design system |
 
 ### Extended Team (on-demand via `ask`)
 

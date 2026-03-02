@@ -108,9 +108,10 @@
 
 ## Coordination Rules
 1. Sequential: M1 -> M2 -> M4 -> M5 (M3 runs parallel)
-2. Reviewer gates: no milestone "done" without reviewer approval
-3. PM updates this file every cycle
-4. Agents update GAP_ANALYSIS.md checkboxes when items complete
+2. Completion policy: milestone is COMPLETE when all acceptance criteria checked. PM force-advances after 2+ cycles code-complete with no P0 blockers.
+3. Reviewer feedback is advisory for P1/P2. Only P0 (system can't run) blocks. Reviewer must APPROVE when criteria are met.
+4. PM updates this file every cycle
+5. Agents update GAP_ANALYSIS.md checkboxes when items complete
 
 ## Progress Log
 
