@@ -162,6 +162,68 @@ both reason about what to build and actually write code.
 Cron IDs are stored so `pause`, `resume`, and `stop` can manage them without
 searching. Multiple projects can exist simultaneously, but only one is active.
 
+## Model Fallback Chain
+
+Agents try models in order: primary → fallback #1 → fallback #2. Configure via:
+
+```bash
+openclaw models set openai-codex/gpt-5.3-codex              # primary
+openclaw models fallbacks add google/gemini-3-flash-preview  # fallback #1
+openclaw models fallbacks add anthropic/claude-sonnet-4-6    # fallback #2
+```
+
+Recommended strategy:
+- **Primary**: OpenAI Codex (good coding, high rate limits)
+- **Fallback #1**: Google Gemini Flash (free tier available, 1M context)
+- **Fallback #2**: Anthropic Claude (best quality, strictest rate limits)
+
+## ACP Integration
+
+Instead of syncing API tokens manually, you can route through Claude Code
+via ACP (Agent Client Protocol). Claude Code handles its own auth refresh.
+
+```
+OpenClaw Agent → openclaw acp → claude-agent-acp → Claude.ai
+                                (handles auth)
+```
+
+Setup:
+```bash
+npm install -g @zed-industries/claude-agent-acp
+```
+
+Add to `~/.openclaw/openclaw.json`:
+```json
+{
+  "acp": {
+    "enabled": true,
+    "dispatch": { "enabled": true },
+    "backend": "acpx",
+    "defaultAgent": "claude",
+    "allowedAgents": ["claude", "codex", "gemini"],
+    "maxConcurrentSessions": 8,
+    "runtime": { "ttlMinutes": 120 }
+  }
+}
+```
+
+Then restart: `openclaw daemon restart`
+
+## Telegram Notifications
+
+Agent crons can deliver summaries to Telegram after each cycle:
+
+```bash
+openclaw cron edit <id> \
+  --announce \
+  --channel telegram \
+  --to <chat-id> \
+  --best-effort-deliver
+```
+
+Find your chat ID in `~/.openclaw/openclaw.json` under
+`channels.telegram.accounts.<name>.allowFrom`.
+
 ## Human Intervention Points
 
 Users can steer the team at any time:

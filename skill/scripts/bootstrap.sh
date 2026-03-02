@@ -11,9 +11,10 @@ set -euo pipefail
 # 4. Registers project in team.json
 # 5. Triggers PM kickoff
 
-PROJECT_NAME="${1:?Usage: bootstrap.sh <project-name> <project-path> [description]}"
+PROJECT_NAME="${1:?Usage: bootstrap.sh <project-name> <project-path> [description] [telegram-chat-id]}"
 PROJECT_PATH="${2:?Provide project path}"
 DESCRIPTION="${3:-Software project}"
+TELEGRAM_CHAT_ID="${4:-}"
 TEAM_JSON="$HOME/.openclaw/team.json"
 TEMPLATE_DIR="$(cd "$(dirname "$0")/.." && pwd)/../templates"
 
@@ -71,6 +72,10 @@ echo "[3/5] Setting up autonomous work cycles..."
 create_cron() {
     local name="$1" agent="$2" interval="$3" timeout="$4" thinking="$5" message="$6"
     local cron_id
+    local extra_args=""
+    if [ -n "$TELEGRAM_CHAT_ID" ]; then
+        extra_args="--announce --channel telegram --to $TELEGRAM_CHAT_ID --best-effort-deliver"
+    fi
     cron_id=$(openclaw cron add \
         --name "${PROJECT_NAME}-${name}" \
         --agent "$agent" \
@@ -79,12 +84,13 @@ create_cron() {
         --session isolated \
         --thinking "$thinking" \
         --json \
+        $extra_args \
         --message "$message" \
         2>&1 | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])" 2>/dev/null || echo "FAILED")
     echo "$cron_id"
 }
 
-PM_ID=$(create_cron "pm" "pm" "20m" "300" "medium" \
+PM_ID=$(create_cron "pm" "pm" "45m" "300" "medium" \
 "You are the PM. You OWN the execution plan. Every cycle:
 1. READ ${PROJECT_PATH}/EXECUTION_PLAN.md
 2. READ ${PROJECT_PATH}/GAP_ANALYSIS.md
@@ -92,9 +98,9 @@ PM_ID=$(create_cron "pm" "pm" "20m" "300" "medium" \
 4. UPDATE EXECUTION_PLAN.md: mark acceptance criteria, update agent status, add progress log entry
 5. FLAG blockers if agents are stuck or working on wrong milestone
 Keep the team on track. Milestones must complete in order unless marked parallel.")
-echo "  [OK] PM cycle (20m): $PM_ID"
+echo "  [OK] PM cycle (45m): $PM_ID"
 
-REV_ID=$(create_cron "reviewer" "reviewer" "20m" "300" "high" \
+REV_ID=$(create_cron "reviewer" "reviewer" "45m" "300" "high" \
 "You are the CODE REVIEWER and TEAM LEAD. Every cycle:
 1. READ ${PROJECT_PATH}/EXECUTION_PLAN.md for current milestones
 2. CHECK recent code in ${PROJECT_PATH}
@@ -102,9 +108,9 @@ REV_ID=$(create_cron "reviewer" "reviewer" "20m" "300" "high" \
 4. WRITE steering instructions to ${PROJECT_PATH}/REVIEWER_FEEDBACK.md -- one section per agent with DO NOW and DO NOT
 5. FLAG if any agent is working on the wrong milestone or producing insecure code
 Your feedback file is what workers read first. Be specific and actionable.")
-echo "  [OK] Reviewer cycle (20m): $REV_ID"
+echo "  [OK] Reviewer cycle (45m): $REV_ID"
 
-ENG_ID=$(create_cron "engineer" "main" "30m" "900" "high" \
+ENG_ID=$(create_cron "engineer" "main" "1h" "1500" "high" \
 "You are the LEAD ENGINEER. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
 2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
@@ -114,7 +120,7 @@ ENG_ID=$(create_cron "engineer" "main" "30m" "900" "high" \
 Stay on your assigned milestone. Do not skip ahead.")
 echo "  [OK] Engineer cycle (30m): $ENG_ID"
 
-SRE_ID=$(create_cron "sre" "sre" "30m" "900" "high" \
+SRE_ID=$(create_cron "sre" "sre" "1h" "1500" "high" \
 "You are the SRE. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
 2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
@@ -124,7 +130,7 @@ SRE_ID=$(create_cron "sre" "sre" "30m" "900" "high" \
 Focus on infrastructure, sandbox, Docker, deployment, resource limits.")
 echo "  [OK] SRE cycle (30m): $SRE_ID"
 
-DES_ID=$(create_cron "designer" "designer" "30m" "900" "high" \
+DES_ID=$(create_cron "designer" "designer" "1h" "1500" "high" \
 "You are the DESIGNER. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
 2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.

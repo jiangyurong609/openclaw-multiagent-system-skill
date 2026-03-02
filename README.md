@@ -71,11 +71,11 @@ openclaw-team status
 
 | Role | Agent | Cycle | What They Do |
 |------|-------|-------|-------------|
-| PM | `pm` | 20 min | Owns milestones, tracks progress, unblocks agents |
-| Reviewer | `reviewer` | 20 min | Security review, quality gates, steers workers |
-| Engineer | `main` | 30 min | Backend code, APIs, business logic |
-| SRE | `sre` | 30 min | Infrastructure, Docker, CI/CD, reliability |
-| Designer | `designer` | 30 min | Frontend UI, components, design system |
+| PM | `pm` | 45 min | Owns milestones, tracks progress, unblocks agents |
+| Reviewer | `reviewer` | 45 min | Security review, quality gates, steers workers |
+| Engineer | `main` | 60 min | Backend code, APIs, business logic |
+| SRE | `sre` | 60 min | Infrastructure, Docker, CI/CD, reliability |
+| Designer | `designer` | 60 min | Frontend UI, components, design system |
 | UXR | `uxr` | on-demand | User research, usability testing |
 | Marketing | `marketing` | on-demand | Go-to-market, positioning, content |
 
@@ -199,11 +199,38 @@ Each agent cycle makes API calls to your configured model provider. With default
 
 See [docs/CUSTOMIZATION.md](docs/CUSTOMIZATION.md) for details.
 
+## Telegram Notifications
+
+Get agent updates in Telegram. Pass your chat ID when creating a project:
+
+```bash
+openclaw-team new my-app ~/Projects/my-app "My app" --to 123456789
+```
+
+Or configure existing crons:
+
+```bash
+openclaw cron edit <id> --announce --channel telegram --to <chat-id> --best-effort-deliver
+```
+
+## Model Providers
+
+The system supports multiple model providers with automatic failover:
+
+```bash
+openclaw models set openai-codex/gpt-5.3-codex              # primary
+openclaw models fallbacks add google/gemini-3-flash-preview  # fallback
+openclaw models fallbacks add anthropic/claude-sonnet-4-6    # last resort
+```
+
+For Claude.ai auth, you can use [ACP integration](docs/ARCHITECTURE.md#acp-integration)
+to route through Claude Code (handles its own OAuth refresh).
+
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) -- system design, coordination protocol, why documents not messages
+- [Architecture](docs/ARCHITECTURE.md) -- system design, model fallbacks, ACP integration, Telegram setup
 - [Customization](docs/CUSTOMIZATION.md) -- adding roles, tuning cycles, model selection
-- [Troubleshooting](docs/TROUBLESHOOTING.md) -- common issues and fixes
+- [Troubleshooting](docs/TROUBLESHOOTING.md) -- auth errors, rate limits, delivery failures, cost optimization
 - [Example: Skill Marketplace](examples/skill-marketplace/) -- real project with 80+ gap items and 5 milestones
 
 ## License

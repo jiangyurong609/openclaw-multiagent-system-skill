@@ -16,7 +16,7 @@ openclaw-team -- Multi-Agent Development Team for OpenClaw
 Usage: openclaw-team <command> [options]
 
 PROJECT COMMANDS:
-  new <name> <path> "<description>"   Create project with full team kickoff
+  new <name> <path> "<desc>" [--to N]  Create project (--to: Telegram chat ID)
   list                                List all projects
   switch <name>                       Set active project
   status [name]                       Show project dashboard
@@ -106,8 +106,14 @@ cmd_new() {
         bootstrap="$SCRIPT_DIR/skill/scripts/bootstrap.sh"
     fi
 
+    # Extract --to flag if present
+    local telegram_to=""
+    if [ "${5:-}" = "--to" ] && [ -n "${6:-}" ]; then
+        telegram_to="$6"
+    fi
+
     if [ -f "$bootstrap" ]; then
-        bash "$bootstrap" "$name" "$path" "$desc"
+        bash "$bootstrap" "$name" "$path" "$desc" "$telegram_to"
     else
         echo "[ERROR] bootstrap.sh not found. Run setup.sh first."
         exit 1
