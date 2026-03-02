@@ -11,10 +11,12 @@ set -euo pipefail
 # 4. Registers project in team.json
 # 5. Triggers PM kickoff
 
-PROJECT_NAME="${1:?Usage: bootstrap.sh <project-name> <project-path> [description] [telegram-chat-id]}"
+PROJECT_NAME="${1:?Usage: bootstrap.sh <project-name> <project-path> [description] [telegram-chat-id] [pm-interval] [worker-interval]}"
 PROJECT_PATH="${2:?Provide project path}"
 DESCRIPTION="${3:-Software project}"
 TELEGRAM_CHAT_ID="${4:-}"
+PM_INTERVAL="${5:-${OPENCLAW_PM_INTERVAL:-45m}}"
+WORKER_INTERVAL="${6:-${OPENCLAW_WORKER_INTERVAL:-1h}}"
 TEAM_JSON="$HOME/.openclaw/team.json"
 TEMPLATE_DIR="$(cd "$(dirname "$0")/.." && pwd)/../templates"
 
@@ -26,6 +28,7 @@ fi
 echo "=== Team Project Bootstrap ==="
 echo "Project: $PROJECT_NAME"
 echo "Path:    $PROJECT_PATH"
+echo "Cycles:  PM/Reviewer($PM_INTERVAL) Workers($WORKER_INTERVAL)"
 echo ""
 
 # -- 1. Verify agents ------------------------------------------------
@@ -90,7 +93,7 @@ create_cron() {
     echo "$cron_id"
 }
 
-PM_ID=$(create_cron "pm" "pm" "45m" "300" "medium" \
+PM_ID=$(create_cron "pm" "pm" "$PM_INTERVAL" "300" "medium" \
 "You are the PM. You OWN the execution plan. Every cycle:
 1. READ ${PROJECT_PATH}/EXECUTION_PLAN.md
 2. READ ${PROJECT_PATH}/GAP_ANALYSIS.md
@@ -98,9 +101,9 @@ PM_ID=$(create_cron "pm" "pm" "45m" "300" "medium" \
 4. UPDATE EXECUTION_PLAN.md: mark acceptance criteria, update agent status, add progress log entry
 5. FLAG blockers if agents are stuck or working on wrong milestone
 Keep the team on track. Milestones must complete in order unless marked parallel.")
-echo "  [OK] PM cycle (45m): $PM_ID"
+echo "  [OK] PM cycle ($PM_INTERVAL): $PM_ID"
 
-REV_ID=$(create_cron "reviewer" "reviewer" "45m" "300" "high" \
+REV_ID=$(create_cron "reviewer" "reviewer" "$PM_INTERVAL" "300" "high" \
 "You are the CODE REVIEWER and TEAM LEAD. Every cycle:
 1. READ ${PROJECT_PATH}/EXECUTION_PLAN.md for current milestones
 2. CHECK recent code in ${PROJECT_PATH}
@@ -108,9 +111,9 @@ REV_ID=$(create_cron "reviewer" "reviewer" "45m" "300" "high" \
 4. WRITE steering instructions to ${PROJECT_PATH}/REVIEWER_FEEDBACK.md -- one section per agent with DO NOW and DO NOT
 5. FLAG if any agent is working on the wrong milestone or producing insecure code
 Your feedback file is what workers read first. Be specific and actionable.")
-echo "  [OK] Reviewer cycle (45m): $REV_ID"
+echo "  [OK] Reviewer cycle ($PM_INTERVAL): $REV_ID"
 
-ENG_ID=$(create_cron "engineer" "main" "1h" "1500" "high" \
+ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
 "You are the LEAD ENGINEER. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
 2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
@@ -118,9 +121,9 @@ ENG_ID=$(create_cron "engineer" "main" "1h" "1500" "high" \
 4. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
 5. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
 Stay on your assigned milestone. Do not skip ahead.")
-echo "  [OK] Engineer cycle (30m): $ENG_ID"
+echo "  [OK] Engineer cycle ($WORKER_INTERVAL): $ENG_ID"
 
-SRE_ID=$(create_cron "sre" "sre" "1h" "1500" "high" \
+SRE_ID=$(create_cron "sre" "sre" "$WORKER_INTERVAL" "1500" "high" \
 "You are the SRE. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
 2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
@@ -128,9 +131,9 @@ SRE_ID=$(create_cron "sre" "sre" "1h" "1500" "high" \
 4. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
 5. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
 Focus on infrastructure, sandbox, Docker, deployment, resource limits.")
-echo "  [OK] SRE cycle (30m): $SRE_ID"
+echo "  [OK] SRE cycle ($WORKER_INTERVAL): $SRE_ID"
 
-DES_ID=$(create_cron "designer" "designer" "1h" "1500" "high" \
+DES_ID=$(create_cron "designer" "designer" "$WORKER_INTERVAL" "1500" "high" \
 "You are the DESIGNER. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
 2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
@@ -138,7 +141,7 @@ DES_ID=$(create_cron "designer" "designer" "1h" "1500" "high" \
 4. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
 5. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
 Focus on frontend UI, React components, design system, user experience.")
-echo "  [OK] Designer cycle (30m): $DES_ID"
+echo "  [OK] Designer cycle ($WORKER_INTERVAL): $DES_ID"
 
 # -- 4. Register project ---------------------------------------------
 echo ""
@@ -189,7 +192,7 @@ echo ""
 echo "=== Bootstrap Complete ==="
 echo ""
 echo "Project '$PROJECT_NAME' is running with 5 autonomous agents."
-echo "Cycles: PM(20m) Reviewer(20m) Engineer(30m) SRE(30m) Designer(30m)"
+echo "Cycles: PM/Reviewer($PM_INTERVAL) Engineer/SRE/Designer($WORKER_INTERVAL)"
 echo ""
 echo "Next steps:"
 echo "  Status:  openclaw-team status"

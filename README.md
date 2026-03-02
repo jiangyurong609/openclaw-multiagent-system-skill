@@ -5,7 +5,7 @@ A multi-agent AI development team that builds software autonomously. Seven speci
 ```
          +-----------+     +-----------+
          |    PM     |     | Reviewer  |
-         | (20 min)  |     | (20 min)  |
+         | (45 min)  |     | (45 min)  |
          +-----+-----+     +-----+-----+
                |                  |
      writes    |                  |  writes
@@ -17,7 +17,7 @@ A multi-agent AI development team that builds software autonomously. Seven speci
             reads     v   v     reads
               +-------------------+
               | Engineer  SRE     |
-              | Designer (30 min) |
+              | Designer (60 min) |
               +--------+----------+
                        |
              updates   v
@@ -85,6 +85,7 @@ openclaw-team status
 
 ```bash
 openclaw-team new <name> <path> "<description>"   # Create project, start agents
+# Optional flags: --to <telegram-chat-id> --pm-interval 30m --worker-interval 45m
 openclaw-team list                                  # List all projects
 openclaw-team switch <name>                         # Set active project
 openclaw-team status                                # Project dashboard
@@ -190,7 +191,7 @@ openclaw-team/
 
 ## Cost Awareness
 
-Each agent cycle makes API calls to your configured model provider. With default settings (5 agents, cycles every 20-30 minutes), expect moderate API usage. To reduce costs:
+Each agent cycle makes API calls to your configured model provider. With default settings (5 agents, cycles every 45-60 minutes), expect moderate API usage. To reduce costs:
 
 - **Increase intervals**: Edit cron timing in `skill/scripts/bootstrap.sh`
 - **Pause when idle**: `openclaw-team pause` stops all cycles
@@ -212,19 +213,6 @@ Or configure existing crons:
 ```bash
 openclaw cron edit <id> --announce --channel telegram --to <chat-id> --best-effort-deliver
 ```
-
-## Model Providers
-
-The system supports multiple model providers with automatic failover:
-
-```bash
-openclaw models set openai-codex/gpt-5.3-codex              # primary
-openclaw models fallbacks add google/gemini-3-flash-preview  # fallback
-openclaw models fallbacks add anthropic/claude-sonnet-4-6    # last resort
-```
-
-For Claude.ai auth, you can use [ACP integration](docs/ARCHITECTURE.md#acp-integration)
-to route through Claude Code (handles its own OAuth refresh).
 
 ## Documentation
 

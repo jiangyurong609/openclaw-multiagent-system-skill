@@ -16,7 +16,10 @@ openclaw-team -- Multi-Agent Development Team for OpenClaw
 Usage: openclaw-team <command> [options]
 
 PROJECT COMMANDS:
-  new <name> <path> "<desc>" [--to N]  Create project (--to: Telegram chat ID)
+  new <name> <path> "<desc>" [options]  Create project
+      --to N                            Telegram chat ID for notifications
+      --pm-interval T                   PM/Reviewer cycle interval (default: 45m)
+      --worker-interval T               Worker cycle interval (default: 1h)
   list                                List all projects
   switch <name>                       Set active project
   status [name]                       Show project dashboard
@@ -44,6 +47,7 @@ ROLES:
 
 EXAMPLES:
   openclaw-team new my-saas ~/Projects/my-saas "B2B SaaS platform"
+  openclaw-team new my-saas ~/Projects/my-saas "B2B SaaS" --pm-interval 30m --worker-interval 45m
   openclaw-team ask pm "Create PRD for user onboarding"
   openclaw-team standup
   openclaw-team build engineer "Implement auth middleware"
@@ -89,11 +93,23 @@ cmd_new() {
     local name="$1" path="$2" desc="${3:-Software project}"
 
     if [ -z "$name" ] || [ -z "$path" ]; then
-        echo "Usage: openclaw-team new <name> <path> \"<description>\""
+        echo "Usage: openclaw-team new <name> <path> \"<description>\" [--to N] [--pm-interval T] [--worker-interval T]"
         exit 1
     fi
 
     path=$(eval echo "$path")
+
+    # Parse optional flags from remaining args
+    shift 3 2>/dev/null || true
+    local telegram_to="" pm_interval="" worker_interval=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --to)             telegram_to="${2:-}"; shift 2 ;;
+            --pm-interval)    pm_interval="${2:-}"; shift 2 ;;
+            --worker-interval) worker_interval="${2:-}"; shift 2 ;;
+            *) shift ;;
+        esac
+    done
 
     echo "Creating project: $name"
     echo "  Path: $path"
@@ -106,14 +122,8 @@ cmd_new() {
         bootstrap="$SCRIPT_DIR/skill/scripts/bootstrap.sh"
     fi
 
-    # Extract --to flag if present
-    local telegram_to=""
-    if [ "${5:-}" = "--to" ] && [ -n "${6:-}" ]; then
-        telegram_to="$6"
-    fi
-
     if [ -f "$bootstrap" ]; then
-        bash "$bootstrap" "$name" "$path" "$desc" "$telegram_to"
+        bash "$bootstrap" "$name" "$path" "$desc" "$telegram_to" "$pm_interval" "$worker_interval"
     else
         echo "[ERROR] bootstrap.sh not found. Run setup.sh first."
         exit 1
@@ -341,7 +351,7 @@ cmd_lifecycle() {
 
 # -- MAIN DISPATCHER -------------------------------------------------
 case "${1:-help}" in
-    new)        cmd_new "${2:-}" "${3:-}" "${4:-}" ;;
+    new)        shift; cmd_new "$@" ;;
     list)       cmd_list ;;
     switch)     cmd_switch "${2:?Specify project name}" ;;
     status)     cmd_status "${2:-}" ;;
