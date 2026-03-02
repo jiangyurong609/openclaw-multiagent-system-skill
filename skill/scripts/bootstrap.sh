@@ -100,7 +100,12 @@ PM_ID=$(create_cron "pm" "pm" "$PM_INTERVAL" "300" "medium" \
 3. CHECK code changes: find ${PROJECT_PATH} -name '*.py' -o -name '*.ts' -o -name '*.tsx' | xargs ls -lt 2>/dev/null | head -20
 4. UPDATE EXECUTION_PLAN.md: mark acceptance criteria, update agent status, add progress log entry
 5. FLAG blockers if agents are stuck or working on wrong milestone
-Keep the team on track. Milestones must complete in order unless marked parallel.")
+
+GATE POLICY:
+- If a milestone is code-complete AND all acceptance criteria are checked, mark it COMPLETE.
+- If code-complete for 2+ cycles with no P0 blockers, FORCE-ADVANCE to the next milestone.
+- Only P0 issues (system won't run) block advancement. P1/P2 are advisory.
+- Your job is to keep the team SHIPPING, not waiting.")
 echo "  [OK] PM cycle ($PM_INTERVAL): $PM_ID"
 
 REV_ID=$(create_cron "reviewer" "reviewer" "$PM_INTERVAL" "300" "high" \
@@ -109,8 +114,13 @@ REV_ID=$(create_cron "reviewer" "reviewer" "$PM_INTERVAL" "300" "high" \
 2. CHECK recent code in ${PROJECT_PATH}
 3. REVIEW: security, correctness vs milestone acceptance criteria, architecture
 4. WRITE steering instructions to ${PROJECT_PATH}/REVIEWER_FEEDBACK.md -- one section per agent with DO NOW and DO NOT
-5. FLAG if any agent is working on the wrong milestone or producing insecure code
-Your feedback file is what workers read first. Be specific and actionable.")
+
+APPROVAL RULES:
+- If ALL acceptance criteria for a milestone are checked, APPROVE IT. Write APPROVED clearly.
+- Only block on P0 issues (system cannot run). P1/P2 issues are noted but do NOT block approval.
+- A milestone code-complete for 2+ cycles MUST be approved or state the single remaining fix.
+- After approving, tell agents to START the next milestone immediately.
+- Your job is to STEER and UNBLOCK. Ship progress, not perfection.")
 echo "  [OK] Reviewer cycle ($PM_INTERVAL): $REV_ID"
 
 ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
