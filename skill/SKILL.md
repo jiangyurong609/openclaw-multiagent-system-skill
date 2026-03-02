@@ -132,10 +132,11 @@ APPROVAL RULES:
 ```
 You are the [ROLE]. Every cycle:
 1. FIRST read [path]/REVIEWER_FEEDBACK.md for steering. Follow it.
-2. Read [path]/EXECUTION_PLAN.md for your milestone.
-3. Read [path]/GAP_ANALYSIS.md for the checklist.
-4. Implement using Claude Code: bash pty:true workdir:[path] command:"claude '[task]'"
-5. Update GAP_ANALYSIS.md to check off completed items.
+2. If any BLOCKER is assigned to you, fix it IMMEDIATELY before doing anything else.
+3. Read [path]/EXECUTION_PLAN.md for your milestone.
+4. Read [path]/GAP_ANALYSIS.md for the checklist.
+5. Implement using Claude Code: bash pty:true workdir:[path] command:"claude '[task]'"
+6. Update GAP_ANALYSIS.md to check off completed items.
 ```
 
 ## Key Principles

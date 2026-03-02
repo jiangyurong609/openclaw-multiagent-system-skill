@@ -120,36 +120,40 @@ APPROVAL RULES:
 - Only block on P0 issues (system cannot run). P1/P2 issues are noted but do NOT block approval.
 - A milestone code-complete for 2+ cycles MUST be approved or state the single remaining fix.
 - After approving, tell agents to START the next milestone immediately.
+- When you write a BLOCKER, you MUST assign it to a specific agent (e.g. 'Engineer: fix X' or 'SRE: fix Y'). Unassigned blockers are ignored.
 - Your job is to STEER and UNBLOCK. Ship progress, not perfection.")
 echo "  [OK] Reviewer cycle ($PM_INTERVAL): $REV_ID"
 
 ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
 "You are the LEAD ENGINEER. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
-2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
-3. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
-4. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
-5. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
+2. If any BLOCKER is assigned to you, fix it IMMEDIATELY before doing anything else.
+3. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
+4. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
+5. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
+6. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
 Stay on your assigned milestone. Do not skip ahead.")
 echo "  [OK] Engineer cycle ($WORKER_INTERVAL): $ENG_ID"
 
 SRE_ID=$(create_cron "sre" "sre" "$WORKER_INTERVAL" "1500" "high" \
 "You are the SRE. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
-2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
-3. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
-4. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
-5. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
+2. If any BLOCKER is assigned to you, fix it IMMEDIATELY before doing anything else.
+3. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
+4. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
+5. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
+6. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
 Focus on infrastructure, sandbox, Docker, deployment, resource limits.")
 echo "  [OK] SRE cycle ($WORKER_INTERVAL): $SRE_ID"
 
 DES_ID=$(create_cron "designer" "designer" "$WORKER_INTERVAL" "1500" "high" \
 "You are the DESIGNER. Every cycle:
 1. FIRST read ${PROJECT_PATH}/REVIEWER_FEEDBACK.md for steering instructions. Follow them.
-2. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
-3. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
-4. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
-5. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
+2. If any BLOCKER is assigned to you, fix it IMMEDIATELY before doing anything else.
+3. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
+4. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
+5. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
+6. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
 Focus on frontend UI, React components, design system, user experience.")
 echo "  [OK] Designer cycle ($WORKER_INTERVAL): $DES_ID"
 
