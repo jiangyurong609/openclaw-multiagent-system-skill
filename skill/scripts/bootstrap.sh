@@ -112,8 +112,9 @@ REV_ID=$(create_cron "reviewer" "reviewer" "$PM_INTERVAL" "300" "high" \
 "You are the CODE REVIEWER and TEAM LEAD. Every cycle:
 1. READ ${PROJECT_PATH}/EXECUTION_PLAN.md for current milestones
 2. CHECK recent code in ${PROJECT_PATH}
-3. REVIEW: security, correctness vs milestone acceptance criteria, architecture
+3. REVIEW: security, correctness vs milestone acceptance criteria, architecture, TEST COVERAGE
 4. WRITE steering instructions to ${PROJECT_PATH}/REVIEWER_FEEDBACK.md -- one section per agent with DO NOW and DO NOT
+5. CHECK TEST COVERAGE: run test commands and report results in your feedback
 
 APPROVAL RULES:
 - If ALL acceptance criteria for a milestone are checked, APPROVE IT. Write APPROVED clearly.
@@ -121,7 +122,13 @@ APPROVAL RULES:
 - A milestone code-complete for 2+ cycles MUST be approved or state the single remaining fix.
 - After approving, tell agents to START the next milestone immediately.
 - When you write a BLOCKER, you MUST assign it to a specific agent (e.g. 'Engineer: fix X' or 'SRE: fix Y'). Unassigned blockers are ignored.
-- Your job is to STEER and UNBLOCK. Ship progress, not perfection.")
+- Your job is to STEER and UNBLOCK. Ship progress, not perfection.
+
+TEST COVERAGE ENFORCEMENT:
+- Check if new code has corresponding test files. Flag untested modules as P1.
+- Backend target: 80%+ coverage. Frontend target: component tests for every page.
+- If coverage drops below 60% on any new module, write a BLOCKER assigned to the module owner.
+- Include test coverage summary in your feedback each cycle.")
 echo "  [OK] Reviewer cycle ($PM_INTERVAL): $REV_ID"
 
 ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
@@ -131,7 +138,15 @@ ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
 3. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
 4. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
 5. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
-6. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
+6. WRITE TESTS for every feature you implement. Use pytest with pytest-cov. Run tests before checking off items.
+7. After implementing AND tests pass, update GAP_ANALYSIS.md to check off completed items [x].
+
+TESTING RULES:
+- Write tests FIRST (TDD): create test file, write failing test, then implement to make it pass.
+- Use pytest-cov to measure coverage. Target 80%+ coverage for any module you touch.
+- Every new endpoint MUST have at least: success test, auth-required test, error case test.
+- Every new module MUST have a corresponding test file.
+- Do NOT check off GAP_ANALYSIS items until tests pass.
 Stay on your assigned milestone. Do not skip ahead.")
 echo "  [OK] Engineer cycle ($WORKER_INTERVAL): $ENG_ID"
 
@@ -142,7 +157,15 @@ SRE_ID=$(create_cron "sre" "sre" "$WORKER_INTERVAL" "1500" "high" \
 3. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
 4. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
 5. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
-6. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
+6. WRITE INTEGRATION TESTS for infrastructure you build. Use pytest with pytest-cov.
+7. After implementing AND tests pass, update GAP_ANALYSIS.md to check off completed items [x].
+
+TESTING RULES:
+- Write integration tests for sandbox, Docker, deployment, and infrastructure code.
+- Test real execution paths (not just mocked). At least 1 test must invoke a real container.
+- Test resource limits enforcement, error paths (container crash, timeout, missing resource).
+- Verify Dockerfile builds successfully as part of your testing.
+- Do NOT check off GAP_ANALYSIS items until tests pass.
 Focus on infrastructure, sandbox, Docker, deployment, resource limits.")
 echo "  [OK] SRE cycle ($WORKER_INTERVAL): $SRE_ID"
 
@@ -153,7 +176,14 @@ DES_ID=$(create_cron "designer" "designer" "$WORKER_INTERVAL" "1500" "high" \
 3. Read ${PROJECT_PATH}/EXECUTION_PLAN.md for your current milestone.
 4. Read ${PROJECT_PATH}/GAP_ANALYSIS.md for the checklist.
 5. Implement your assigned task using Claude Code: bash pty:true workdir:${PROJECT_PATH} command:\"claude 'implement [your task]'\"
-6. After implementing, update GAP_ANALYSIS.md to check off completed items [x].
+6. WRITE COMPONENT TESTS for UI using the project's test framework (e.g. Vitest + React Testing Library).
+7. After implementing AND tests pass, update GAP_ANALYSIS.md to check off completed items [x].
+
+TESTING RULES:
+- Install test framework if missing (vitest, @testing-library/react, jsdom, etc.).
+- Write tests for every component and page you create or modify.
+- Test: rendering, user interactions, API integration (mock fetch), auth state.
+- Do NOT check off GAP_ANALYSIS items until tests pass.
 Focus on frontend UI, React components, design system, user experience.")
 echo "  [OK] Designer cycle ($WORKER_INTERVAL): $DES_ID"
 

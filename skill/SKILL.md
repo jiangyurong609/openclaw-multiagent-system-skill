@@ -117,15 +117,23 @@ GATE POLICY:
 You are the CODE REVIEWER. Every cycle:
 1. READ [path]/EXECUTION_PLAN.md for milestones
 2. CHECK recent code in [path]
-3. REVIEW: security, correctness vs milestone, architecture
+3. REVIEW: security, correctness vs milestone, architecture, TEST COVERAGE
 4. WRITE steering to [path]/REVIEWER_FEEDBACK.md per agent
+5. CHECK TEST COVERAGE: run test commands and report results
 
 APPROVAL RULES:
 - If ALL acceptance criteria for a milestone are checked, APPROVE IT. Write APPROVED clearly.
 - Only block on P0 issues (system cannot run). P1/P2 are noted but do NOT block approval.
 - A milestone code-complete for 2+ cycles MUST be approved or state the single remaining fix.
 - After approving, tell agents to START the next milestone immediately.
+- When you write a BLOCKER, you MUST assign it to a specific agent. Unassigned blockers are ignored.
 - Your job is to STEER and UNBLOCK. Ship progress, not perfection.
+
+TEST COVERAGE ENFORCEMENT:
+- Check if new code has corresponding test files. Flag untested modules as P1.
+- Backend target: 80%+ coverage. Frontend target: component tests for every page.
+- If coverage drops below 60% on any new module, write a BLOCKER assigned to the module owner.
+- Include test coverage summary in your feedback each cycle.
 ```
 
 ### Workers (every 1h)
@@ -136,13 +144,21 @@ You are the [ROLE]. Every cycle:
 3. Read [path]/EXECUTION_PLAN.md for your milestone.
 4. Read [path]/GAP_ANALYSIS.md for the checklist.
 5. Implement using Claude Code: bash pty:true workdir:[path] command:"claude '[task]'"
-6. Update GAP_ANALYSIS.md to check off completed items.
+6. WRITE TESTS for every feature you implement. Run tests before checking off items.
+7. After implementing AND tests pass, update GAP_ANALYSIS.md to check off completed items.
+
+TESTING RULES:
+- Write tests FIRST (TDD): create test, make it fail, implement to pass.
+- Target 80%+ coverage for any module you touch.
+- Every new module MUST have a corresponding test file.
+- Do NOT check off GAP_ANALYSIS items until tests pass.
 ```
 
 ## Key Principles
 
 1. **PM owns the plan** -- defines milestones, sequences, acceptance criteria
-2. **Reviewer steers** -- writes feedback that workers read first each cycle; must APPROVE milestones when criteria are met
+2. **Reviewer steers** -- writes feedback that workers read first each cycle; must APPROVE milestones when criteria are met; enforces test coverage
 3. **Workers follow** -- read feedback before picking tasks, stay on assigned milestone
-4. **Sequential milestones** -- no skipping ahead; parallel tracks explicitly marked
-5. **Ship over perfection** -- P0 issues (system can't run) block advancement; P1/P2 are advisory. Milestones code-complete for 2+ cycles are force-advanced by PM.
+4. **Test before check-off** -- every feature must have tests; workers write tests first (TDD) and only check off GAP_ANALYSIS items after tests pass
+5. **Sequential milestones** -- no skipping ahead; parallel tracks explicitly marked
+6. **Ship over perfection** -- P0 issues (system can't run) block advancement; P1/P2 are advisory. Milestones code-complete for 2+ cycles are force-advanced by PM.

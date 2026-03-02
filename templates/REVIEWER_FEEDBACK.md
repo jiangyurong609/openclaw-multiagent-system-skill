@@ -32,14 +32,21 @@
 
 ---
 
+## Test Coverage Status
+- <!-- Backend coverage: X% (run pytest --cov) -->
+- <!-- Frontend coverage: X tests passing (run vitest) -->
+- <!-- Untested modules: list any new modules missing tests -->
+
 ## Overall Assessment
 - <!-- Security issues found? (P0 = blocks, P1/P2 = advisory) -->
 - <!-- Are agents on the right milestone? -->
 - <!-- Code quality concerns? -->
+- <!-- Test coverage adequate? -->
 
 ## Approval Rules (Reviewer MUST follow)
 1. If ALL acceptance criteria for a milestone are checked, write **APPROVED** and tell agents to start the next milestone.
 2. Only block on P0 issues (system cannot run). P1/P2 are noted but do not block.
 3. A milestone code-complete for 2+ cycles MUST be approved or state the single remaining fix.
 4. When writing a BLOCKER, you MUST assign it to a specific agent (e.g. "Engineer: fix X"). Unassigned blockers are ignored by workers.
-5. Your job is to steer and unblock. Ship progress, not perfection.
+5. **TEST COVERAGE below 60% on any new module is a BLOCKER** assigned to the module owner.
+6. Your job is to steer and unblock. Ship progress, not perfection.
