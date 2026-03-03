@@ -3,6 +3,7 @@
 **Owner:** PM Agent
 **Project:** <!-- Project name -->
 **Updated:** <!-- PM updates each cycle -->
+**Reference:** <!-- Optional: URL to reference site for feature comparison -->
 
 ---
 
@@ -65,6 +66,15 @@
 4. **PM updates** -- PM updates this file every cycle with actual status
 5. **Blockers** -- if an agent is blocked, PM notes it here with suggested unblocking. Agents must not idle waiting for approval.
 6. **File changes** -- agents update GAP_ANALYSIS.md checkboxes when items complete
+7. **Auto-milestone generation** -- when ALL milestones are COMPLETE, PM reads GAP_ANALYSIS.md for remaining unchecked items, groups them into a new milestone, and writes it here with acceptance criteria and agent assignments. If a Reference URL exists, PM compares delivered features against it before creating the new milestone.
+
+## Reference Comparison
+
+<!-- If a Reference URL is set, PM compares delivered features against it each cycle -->
+
+| Feature | Reference | Delivered | Gap | Priority |
+|---------|-----------|-----------|-----|----------|
+| <!-- Feature --> | Yes/No | Yes/No | <!-- Gap description --> | P0/P1/P2 |
 
 ## Progress Log
 

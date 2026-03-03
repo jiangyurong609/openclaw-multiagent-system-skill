@@ -162,3 +162,34 @@ TESTING RULES:
 4. **Test before check-off** -- every feature must have tests; workers write tests first (TDD) and only check off GAP_ANALYSIS items after tests pass
 5. **Sequential milestones** -- no skipping ahead; parallel tracks explicitly marked
 6. **Ship over perfection** -- P0 issues (system can't run) block advancement; P1/P2 are advisory. Milestones code-complete for 2+ cycles are force-advanced by PM.
+
+## Reference URL Comparison Protocol
+
+When a project's `GAP_ANALYSIS.md` includes a `Reference:` URL:
+- **PM**: Compare delivered features against the reference site each cycle. Note feature gaps in the progress log and prioritize P0 gaps over polish items.
+- **Reviewer**: Compare ACTUAL delivered UI/UX quality against the reference site. Flag visual/feature gaps as P1 assigned to Designer.
+- **Designer**: Study the reference site BEFORE implementing any UI. Match feature set, layout patterns, and visual polish level.
+
+## Auto-Milestone Generation
+
+When ALL milestones are COMPLETE and no new milestone exists:
+1. **PM** reads `GAP_ANALYSIS.md` for remaining unchecked items
+2. If a Reference URL exists, PM compares delivered features against the reference
+3. PM groups unchecked items into a new milestone with acceptance criteria
+4. PM writes the new milestone to `EXECUTION_PLAN.md` with agent assignments
+5. PM updates `REVIEWER_FEEDBACK.md` to direct agents to the new milestone
+- The team must NEVER idle. If all milestones are done, create the next one.
+
+## FILE I/O Rules
+
+- **NEVER** use `~` or tilde in file paths. ALWAYS use the full absolute path.
+- When using the Bash tool: `Bash command:"cat ${PROJECT_PATH}/filename.md"`
+- NEVER construct paths like `~/Documents/...` — ALWAYS use `${PROJECT_PATH}/...`
+
+## Post-Completion Behavior
+
+When ALL milestones are COMPLETE and no new milestone exists, workers (Engineer, SRE, Designer):
+1. Read `GAP_ANALYSIS.md` for remaining unchecked P0 items relevant to your role
+2. Self-assign the highest-priority unchecked item
+3. Implement with tests, check it off
+4. Do NOT idle or write "nothing to do" cycle logs

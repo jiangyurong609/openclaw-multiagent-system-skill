@@ -107,7 +107,23 @@ GATE POLICY:
 - Only P0 issues (system won't run) block advancement. P1/P2 are advisory.
 - Your job is to keep the team SHIPPING, not waiting.
 
-CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
+AUTO-MILESTONE GENERATION:
+- If ALL milestones are COMPLETE and no new milestone exists:
+  1. Read GAP_ANALYSIS.md for remaining unchecked items
+  2. If Reference URL exists, compare delivered features against reference
+  3. Group unchecked items into a new milestone with acceptance criteria
+  4. Write the new milestone to EXECUTION_PLAN.md with agent assignments
+  5. Update REVIEWER_FEEDBACK.md to direct agents to new milestone
+- Do NOT let the team idle.
+
+REFERENCE COMPARISON:
+- If GAP_ANALYSIS.md has a Reference URL, compare delivered product against it each cycle
+- Note feature gaps in progress log; prioritize P0 gaps over polish
+
+FILE I/O RULES:
+- NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path.
+- When using the Bash tool: Bash command:\"cat ${PROJECT_PATH}/filename.md\"
+- NEVER construct paths like ~/Documents/... -- ALWAYS use ${PROJECT_PATH}/...")
 echo "  [OK] PM cycle ($PM_INTERVAL): $PM_ID"
 
 REV_ID=$(create_cron "reviewer" "reviewer" "$PM_INTERVAL" "300" "high" \
@@ -132,7 +148,16 @@ TEST COVERAGE ENFORCEMENT:
 - If coverage drops below 60% on any new module, write a BLOCKER assigned to the module owner.
 - Include test coverage summary in your feedback each cycle.
 
-CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
+FEATURE QUALITY ENFORCEMENT:
+- If GAP_ANALYSIS.md has a Reference URL, compare ACTUAL delivered UI/UX against reference
+- Flag visual/feature gaps as P1 assigned to Designer
+- Frontend quality bar: skeleton loaders, error states, empty states, responsive design, proper typography, animations
+- Bare-minimum UIs (\"Loading...\" text, no footer, 10 lines of CSS) are a P1 issue
+
+FILE I/O RULES:
+- NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path.
+- When using the Bash tool: Bash command:\"cat ${PROJECT_PATH}/filename.md\"
+- NEVER construct paths like ~/Documents/... -- ALWAYS use ${PROJECT_PATH}/...")
 echo "  [OK] Reviewer cycle ($PM_INTERVAL): $REV_ID"
 
 ENG_ID=$(create_cron "engineer" "main" "$WORKER_INTERVAL" "1500" "high" \
@@ -153,7 +178,17 @@ TESTING RULES:
 - Do NOT check off GAP_ANALYSIS items until tests pass.
 Stay on your assigned milestone. Do not skip ahead.
 
-CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
+POST-COMPLETION PROTOCOL:
+- If ALL milestones are COMPLETE and no new milestone exists:
+  1. Read GAP_ANALYSIS.md for remaining unchecked P0 items relevant to your role
+  2. Self-assign the highest-priority unchecked item
+  3. Implement with tests, check it off
+  4. Do NOT idle or write 'nothing to do' cycle logs.
+
+FILE I/O RULES:
+- NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path.
+- When using the Bash tool: Bash command:\"cat ${PROJECT_PATH}/filename.md\"
+- NEVER construct paths like ~/Documents/... -- ALWAYS use ${PROJECT_PATH}/...")
 echo "  [OK] Engineer cycle ($WORKER_INTERVAL): $ENG_ID"
 
 SRE_ID=$(create_cron "sre" "sre" "$WORKER_INTERVAL" "1500" "high" \
@@ -174,7 +209,17 @@ TESTING RULES:
 - Do NOT check off GAP_ANALYSIS items until tests pass.
 Focus on infrastructure, sandbox, Docker, deployment, resource limits.
 
-CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
+POST-COMPLETION PROTOCOL:
+- If ALL milestones are COMPLETE and no new milestone exists:
+  1. Read GAP_ANALYSIS.md for remaining unchecked P0 items relevant to your role
+  2. Self-assign the highest-priority unchecked item
+  3. Implement with tests, check it off
+  4. Do NOT idle or write 'nothing to do' cycle logs.
+
+FILE I/O RULES:
+- NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path.
+- When using the Bash tool: Bash command:\"cat ${PROJECT_PATH}/filename.md\"
+- NEVER construct paths like ~/Documents/... -- ALWAYS use ${PROJECT_PATH}/...")
 echo "  [OK] SRE cycle ($WORKER_INTERVAL): $SRE_ID"
 
 DES_ID=$(create_cron "designer" "designer" "$WORKER_INTERVAL" "1500" "high" \
@@ -194,7 +239,26 @@ TESTING RULES:
 - Do NOT check off GAP_ANALYSIS items until tests pass.
 Focus on frontend UI, React components, design system, user experience.
 
-CRITICAL: NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path ${PROJECT_PATH}/ when reading or writing ANY file.")
+VISUAL QUALITY BAR (CRITICAL):
+- You build PRODUCTION-QUALITY frontends, not prototypes
+- If GAP_ANALYSIS.md has a Reference URL, study it BEFORE implementing
+- Every page MUST have: skeleton loaders (not \"Loading...\" text), error states (styled cards), empty states (with icons)
+- Use proper CSS architecture (Tailwind CSS or organized CSS modules with design tokens)
+- Include: transitions, hover effects, proper typography hierarchy, responsive breakpoints
+- Cards must be rich: author avatar, rating badge, star count, category tag, description truncation
+- Footer, loading states, and animations are NOT optional
+
+POST-COMPLETION PROTOCOL:
+- If ALL milestones are COMPLETE and no new milestone exists:
+  1. Read GAP_ANALYSIS.md for remaining unchecked P0 items relevant to your role
+  2. Self-assign the highest-priority unchecked item
+  3. Implement with tests, check it off
+  4. Do NOT idle or write 'nothing to do' cycle logs.
+
+FILE I/O RULES:
+- NEVER use ~ or tilde in file paths. ALWAYS use the full absolute path.
+- When using the Bash tool: Bash command:\"cat ${PROJECT_PATH}/filename.md\"
+- NEVER construct paths like ~/Documents/... -- ALWAYS use ${PROJECT_PATH}/...")
 echo "  [OK] Designer cycle ($WORKER_INTERVAL): $DES_ID"
 
 # -- 4. Register project ---------------------------------------------

@@ -3,6 +3,7 @@
 **Owner:** PM Agent
 **Project:** <!-- Project name -->
 **Updated:** <!-- PM updates each cycle -->
+**Reference:** <!-- Optional: URL to reference site for feature comparison -->
 
 ## Mission
 
@@ -54,6 +55,14 @@
 
 <!-- Document decisions that should NOT be revisited -->
 <!-- Example: Auth provider, pricing model, tech stack choices -->
+
+## Reference Comparison
+
+<!-- If a Reference URL is set, PM/Reviewer compare delivered product against it each cycle -->
+
+| Feature | Reference Has It? | We Have It? | Gap | Priority | Assigned To |
+|---------|-------------------|-------------|-----|----------|-------------|
+| <!-- Feature name --> | Yes/No | Yes/No | <!-- Description of gap --> | P0/P1/P2 | <!-- Agent --> |
 
 ## North Star Metrics
 
